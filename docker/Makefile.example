@@ -248,13 +248,10 @@ app-to-scratch:
 
 app-new-symfony-stable-docker:
 	$(DOCKER) exec -it $(PHP) bash -c \
-		'symfony new "application-stable-$(APP_NAME)" --dir="/var/www/html/application-stable-$(APP_NAME)"  --version="stable" --php="8.2" --no-git --docker --debug'
+		'symfony new "application-$(APP_NAME)" --dir="/var/www/html/application-$(APP_NAME)"  --version="stable" --php="8.2" --no-git --docker --debug'
 
-app-new-symfony-stable-raw:
-	symfony new 'application-stable-$(APP_NAME)' \
-		--dir='/var/www/html/application-stable-$(APP_NAME)' \
-		--version='stable' \
-		--php='8.2' \
+app-new-symfony-application-stable-raw:
+	symfony new 'application-$(APP_NAME)' --dir='/var/www/html/application-$(APP_NAME)' --php='8.2' --version='stable' \
 		--no-git \
 		--docker \
 		--debug
