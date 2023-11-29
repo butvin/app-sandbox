@@ -10,8 +10,11 @@ ifndef APP_ENV
 	endif
 endif
 
-# The APP_NAME is a microservice or application name.
-APP_NAME=$(APP_NAME)
+ifndef APP_ENV
+$(error APP_ENV is not set)
+endif
+
+# The APP_NAME is a microservice or application name
 ifndef APP_NAME
 $(error APP_NAME is not set)
 endif
@@ -24,15 +27,22 @@ endif
 # Actually it is the same thing, but the first one is a new way to use docker-compose.
 # [docs](https://docs.docker.com/compose/migrate/)
 COMPOSE=docker --log-level debug compose
+ifndef COMPOSE
+$(error COMPOSE is not set)
+endif
+
 DOCKER=docker --log-level debug
+ifndef DOCKER
+$(error DOCKER is not set)
+endif
 
 
 # The APPLICATION is a microservice name.
 #APPLICATION=$(APPLICATION)
-APPLICATION=
-#ifndef APPLICATION
-#$(error APPLICATION is not set)
-#endif
+APPLICATION=application
+ifndef APPLICATION
+$(error APPLICATION is not set)
+endif
 
 
 
@@ -40,13 +50,18 @@ APPLICATION=
 # You may find its value in the docker-compose.yml file in the database service section.
 # Often it is a container name unique name or other unique sensitive param.
 DATABASE=
+#ifndef DATABASE
+#$(error DATABASE is not set)
+#endif
 
 
 
 
 # The GLOBAL database is used for all microservices purposes.
 MAIN_DATABASE=
-
+#ifndef MAIN_DATABASE
+#$(error MAIN_DATABASE is not set)
+#endif
 
 
 
@@ -56,6 +71,9 @@ MAIN_DATABASE=
 # In fact it is a  path to the project (PHP) root directory inside the apps container.
 # Define or override it if you need to change it. (e.g. /var/www/html/sub.domain.zone/ or /application)
 WORKING_DIR=/var/www/html
+ifndef WORKING_DIR
+$(error WORKING_DIR is not set)
+endif
 
 
 
@@ -64,23 +82,27 @@ WORKING_DIR=/var/www/html
 # An optional name of the docker-compose.yml services, containers name prefix. Used for tags building, running, and cleaning the project.
 # Usefully when you need to run multiple projects, and micro-systems on the same host.
 PREFIX=$(APP_NAME)
-
-ifndef APP_ENV
-	include .env
-	ifneq ("$(wildcard .env.local)","")
-		include .env.local
-	endif
+ifndef PREFIX
+$(error PREFIX is not set)
 endif
 
 
 
 
+# The COMPOSE_PROJECT_NAME is a docker-compose project name.
+ifndef COMPOSE_PROJECT_NAME
+$(error COMPOSE_PROJECT_NAME is not set)
+endif
+
+
 # Container names
-PHP=$(PREFIX).application.php
-APACHE=$(PREFIX).application.apache
+PHP=$(PREFIX).$(APPLICATION).php
+APACHE=$(PREFIX).$(APPLICATION).apache
+REDIS=$(PREFIX).$(APPLICATION).redis
+DATABASE=$(PREFIX).$(APPLICATION).database
 #ZOOKEEPER=$(PREFIX).application.zookeeper
 #KAFKA=$(PREFIX).application.kafka
-REDIS=$(PREFIX).application.redis
+
 #MYSQL=$(PREFIX).application.mysql
 #ELASTICSEARCH=$(PREFIX).application.elasticsearch
 #KIBANA=$(PREFIX).application.kibana
@@ -214,11 +236,26 @@ fish:
 	$(DOCKER) exec -it $(PHP) fish
 
 
-app-new:
-	$(DOCKER) exec -it $(PHP) bash -c 'symfony new $(APP_NAME) --no-git --docker --debug --version="stable" --php="8.2" --dir="/var/www/html" '
+app: fish
 
-app-new-html:
-	symfony new html --no-git --docker --debug \
-    	--version='stable' \
-    	--php='8.2' \
-    	--dir='/var/www/html'
+app-from-scratch:
+	cp ./docker/.env.example ./.env
+	cp ./docker/Makefile.example ./Makefile
+
+app-to-scratch:
+	cp ./.env ./docker/.env.example
+	cp ./Makefile ./docker/Makefile.example
+
+app-new-symfony-stable-docker:
+	$(DOCKER) exec -it $(PHP) bash -c \
+		'symfony new "application-stable-$(APP_NAME)" --dir="/var/www/html/application-stable-$(APP_NAME)"  --version="stable" --php="8.2" --no-git --docker --debug'
+
+app-new-symfony-stable-raw:
+	symfony new 'application-stable-$(APP_NAME)' \
+		--dir='/var/www/html/application-stable-$(APP_NAME)' \
+		--version='stable' \
+		--php='8.2' \
+		--no-git \
+		--docker \
+		--debug
+
