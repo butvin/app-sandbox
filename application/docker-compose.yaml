@@ -2,9 +2,7 @@ version: '3.9'
 
 networks:
     global-application-network:
-
     local-application-network:
-        name: sun-network
 
 services:
 
