@@ -19,7 +19,12 @@ ifndef APP_NAME
 $(error APP_NAME is not set)
 endif
 
-
+# The APPLICATION is a microservice name.
+#APPLICATION=$(APPLICATION)
+#APPLICATION=application
+ifndef APPLICATION
+$(error APPLICATION is not set)
+endif
 
 
 ### PROCESS #1.1 - GET ENVIRONMENT: domain, service, node, get actual ENVs, check required vars & files
@@ -37,12 +42,7 @@ $(error DOCKER is not set)
 endif
 
 
-# The APPLICATION is a microservice name.
-#APPLICATION=$(APPLICATION)
-APPLICATION=application
-ifndef APPLICATION
-$(error APPLICATION is not set)
-endif
+
 
 
 
