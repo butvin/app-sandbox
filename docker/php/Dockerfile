@@ -1,5 +1,5 @@
 
-FROM php:8.2-fpm as application
+FROM php:8.2-fpm
 
 LABEL maintainer="serhii butvin"
 
